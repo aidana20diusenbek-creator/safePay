@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafePay AI — Система защиты будущего</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ОСНОВНЫЕ НАСТРОЙКИ (ТВОИ БЕЗ ИЗМЕНЕНИЙ) */
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #06111f;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 4px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            z-index: 2000; width: 0%;
+        }
+
+        body::before, body::after {
+            content: ''; position: fixed; border-radius: 50%; z-index: -1; opacity: 0.15; filter: blur(150px);
+        }
+        body::before { width: 600px; height: 600px; background: #2563eb; top: -200px; right: -150px; animation: move 10s infinite alternate; }
+        body::after { width: 500px; height: 500px; background: #7c3aed; bottom: -250px; left: -150px; animation: move 12s infinite alternate-reverse; }
+
+        @keyframes move { from { transform: translate(0, 0); } to { transform: translate(50px, 100px); } }
+
+        header {
+            position: fixed; width: 100%; top: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 60px; background: rgba(7, 17, 31, 0.8);
+            backdrop-filter: blur(15px); z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo {
+            font-size: 24px; font-weight: 800;
+            background: linear-gradient(90deg, #60a5fa, #818cf8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        nav a { text-decoration: none; color: #cbd5e1; margin-left: 24px; font-size: 15px; transition: 0.3s; padding: 6px 12px; border-radius: 8px; }
+        nav a:hover { color: white; text-shadow: 0 0 10px rgba(96,165,250,0.5); }
+        
+        /* Визуальное выделение активного раздела при скролле */
+        nav a.active { color: #60a5fa; background: rgba(37, 99, 235, 0.15); border: 1px solid rgba(96, 165, 250, 0.25); }
+
+        .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 120px 20px 80px; }
+        .badge { padding: 10px 18px; border-radius: 999px; background: rgba(37,99,235,0.15); border: 1px solid rgba(96,165,250,0.25); color: #93c5fd; font-size: 14px; margin-bottom: 30px; }
+
+        .hero h1 { font-size: 68px; font-weight: 800; line-height: 1.1; max-width: 900px; margin-bottom: 25px; min-height: 150px; }
+        .hero p { font-size: 18px; line-height: 1.8; color: #94a3b8; max-width: 760px; }
+
+        /* ЭФФЕКТ ПЕЧАТНОЙ МАШИНКИ (КАСТОМНЫЙ КУРСОР ТЕКСТА) */
+        .typewriter-cursor {
+            color: #60a5fa;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .hero-image img {
+            width: 100%; max-width: 900px; margin-top: 50px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(37, 99, 235, 0.2);
+            transition: 0.5s ease;
+        }
+        .hero-image img:hover { transform: translateY(-10px) rotateX(2deg); border-color: #3b82f6; }
+
+        .hero-buttons { display: flex; gap: 16px; margin-top: 35px; justify-content: center; }
+
+        .btn { padding: 15px 28px; border: none; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .btn-primary { background: linear-gradient(90deg, #2563eb, #4f46e5); color: white; box-shadow: 0 10px 30px rgba(37,99,235,0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.08); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(37,99,235,0.5); }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; max-width: 1200px; margin-top: 80px; }
+        .stat-card { background: rgba(17,24,39,0.7); border: 1px solid rgba(255,255,255,0.05); padding: 28px; border-radius: 24px; backdrop-filter: blur(10px); }
+        .stat-card h2 { font-size: 36px; margin-bottom: 10px; color: #60a5fa; }
+
+        .section { padding: 120px 20px; max-width: 1300px; margin: auto; }
+        .section-title { text-align: center; margin-bottom: 70px; }
+        .section-title h2 { font-size: 46px; margin-bottom: 18px; }
+        .section-title p { color: #94a3b8; max-width: 760px; margin: auto; line-height: 1.8; }
+
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+        .feature-card { background: rgba(17,24,39,0.75); border: 1px solid rgba(255,255,255,0.06); padding: 35px 28px; border-radius: 26px; transition: 0.35s; }
+        .feature-card:hover { transform: translateY(-8px); border-color: #3b82f6; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .feature-icon { font-size: 42px; margin-bottom: 18px; }
+
+        .ai-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; align-items: center; }
+        .ai-panel { background: rgba(17,24,39,0.8); border: 1px solid rgba(255,255,255,0.06); padding: 40px; border-radius: 28px; }
+        .inputs { display: flex; flex-direction: column; gap: 16px; }
+        input, select, textarea { background: #0f172a; border: 1px solid rgba(255,255,255,0.05); padding: 16px; border-radius: 14px; color: white; width: 100%; }
+        input:focus { outline: none; border-color: #3b82f6; }
+
+        .result-box { margin-top: 25px; padding: 22px; border-radius: 18px; background: #0f172a; border-left: 5px solid #3b82f6; }
+
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center; }
+        .modal-content { background: #111827; padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; width: 90%; animation: scaleUp 0.3s ease; }
+        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .chat-box { background: #0f172a; padding: 20px; border-radius: 18px; height: 250px; overflow-y: auto; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .message { margin-bottom: 14px; padding: 12px 14px; border-radius: 12px; max-width: 80%; }
+        .user { background: #2563eb; margin-left: auto; }
+        .ai { background: #1e293b; }
+
+        .timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+        .timeline-card { background: rgba(17,24,39,0.75); padding: 30px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.06); }
+
+        footer { padding: 60px 20px; text-align: center; color: #64748b; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 80px; }
+
+        /* СТИЛИ ДЛЯ ДОПОЛНИТЕЛЬНЫХ КРИТЕРИЕВ */
+        .dynamic-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(15, 23, 42, 0.5); border-radius: 15px; overflow: hidden; }
+        .dynamic-table th, .dynamic-table td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dynamic-table th { background: rgba(37, 99, 235, 0.1); color: #60a5fa; }
+
+        .ai-motivation-box { background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1)); padding: 25px; border-radius: 20px; border: 1px solid rgba(96,165,250,0.2); margin-top: 20px; text-align: center; }
+        #motivationDisplay { font-style: italic; color: #93c5fd; margin-bottom: 15px; min-height: 40px; }
+
+        /* Кнопка наверх */
+        .back-to-top {
+            position: fixed; bottom: 35px; right: 35px; background: linear-gradient(90deg, #2563eb, #4f46e5); color: white;
+            width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 22px; cursor: pointer;
+            display: none; z-index: 1500; box-shadow: 0 8px 25px rgba(37,99,235,0.4); transition: 0.3s;
+        }
+        .back-to-top:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(37,99,235,0.6); }
+
+        /* НЕОНОВАЯ ИИ-РАМКА ДЛЯ ВИДЕО СО СКАНИРОВАНИЕМ */
+        .cyber-video-wrapper {
+            position: relative;
+            width: 900px; max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            background: rgba(7, 17, 31, 0.6);
+            border: 2px solid #2563eb;
+            border-radius: 32px;
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
+            overflow: hidden;
+        }
+        .cyber-video-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+            box-shadow: 0 0 15px #60a5fa;
+            animation: cyberScan 4s linear infinite;
+        }
+        @keyframes cyberScan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        /* Дополнительный блок для красивой ИИ-картинки внутри "О проекте" */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+        .about-img img {
+            width: 100%;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+
+        /* СТИЛИ ДЛЯ НОВЫХ БЛОКОВ (FAQ, ТЕХНОЛОГИИ, АУДИТОРИЯ) */
+        .faq-container { display: flex; flex-direction: column; gap: 16px; max-width: 900px; margin: 0 auto; }
+        .faq-item { background: rgba(17,24,39,0.7); border: 1px solid rgba(255,255,255,0.05); padding: 24px; border-radius: 18px; }
+        .faq-item h3 { color: #60a5fa; margin-bottom: 10px; font-size: 18px; }
+        .faq-item p { color: #cbd5e1; line-height: 1.6; font-size: 15px; }
+
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 30px; }
+        .tech-badge { background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(96, 165, 250, 0.2); color: #93c5fd; padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; }
+
+        @media(max-width: 1000px){ 
+            .ai-wrapper, .about-grid { grid-template-columns: 1fr; } 
+            nav { display: none; } 
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="myBar"></div>
+
+<!-- КНОПКА НАВЕРХ -->
+<button class="back-to-top" id="backToTopBtn" onclick="scrollToTop()">↑</button>
+
+<div id="fraudModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle" style="color:#60a5fa; margin-bottom:15px;"></h2>
+        <p id="modalText" style="line-height:1.7; color:#cbd5e1; margin-bottom:25px; white-space: pre-line;"></p>
+        <button class="btn btn-primary" style="width: 100%;" onclick="closeModal()">Закрыть</button>
+    </div>
+</div>
+
+<header>
+    <div class="logo">SafePay AI</div>
+    <nav>
+        <a href="#home" id="link-home" class="active" onclick="scrollToSection('home')">Главная</a>
+        <a href="#about" id="link-about" onclick="scrollToSection('about')">О проекте</a>
+        <a href="#analysis" id="link-analysis" onclick="scrollToSection('analysis')">AI анализ</a>
+        <a href="#audience" id="link-audience" onclick="scrollToSection('audience')">Аудитория</a>
+        <a href="#faq" id="link-faq" onclick="scrollToSection('faq')">FAQ</a>
+        <a href="#contact" id="link-contact" onclick="scrollToSection('contact')">Контакты</a>
+    </nav>
+</header>
+
+<!-- ГЛАВНАЯ СЕКЦИЯ -->
+<section class="hero" id="home">
+    <div class="badge">AI система анализа финансовых транзакций</div>
+    <h1 id="mainTitle">Защита от финансового мошенничества <br><span id="typewriterText" style="color:#60a5fa;"></span><span class="typewriter-cursor">|</span></h1>
+    <p>SafePay AI анализирует подозрительные транзакции, оценивает риск мошенничества и помогает повысить безопасность цифровых платежей.</p>
+    
+    <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=1600&auto=format&fit=crop" alt="SafePay AI Protection Center">
+    </div>
+
+    <div class="hero-buttons">
+        <button class="btn btn-primary" onclick="scrollToSection('analysis')">Проверить транзакцию</button>
+        <button class="btn btn-secondary" onclick="scrollToSection('about')">Подробнее о проекте</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card"><h2>94%</h2><p>Точность определения подозрительных операций</p></div>
+        <div class="stat-card"><h2>120K+</h2><p>Проверенных финансовых транзакций</p></div>
+        <div class="stat-card"><h2>3200+</h2><p>Выявленных случаев мошенничества</p></div>
+        <div class="stat-card"><h2>24/7</h2><p>Мониторинг операций в реальном времени</p></div>
+    </div>
+</section>
+
+<!-- О ПРОЕКТЕ -->
+<section class="section" id="about">
+    <div class="section-title">
+        <h2>О проекте</h2>
+        <p>Проект разработан в рамках дисциплины «Информационно-коммуникационные технологии» и представляет собой веб-платформу для анализа финансовых транзакций с использованием элементов искусственного интеллекта.</p>
+    </div>
+
+    <div class="about-grid">
+        <div class="features" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI анализ</h3>
+                <p>Система оценивает вероятность мошенничества на основе суммы и географии операции.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Визуализация</h3>
+                <p>Интерактивные графики помогают наглядно отображать уровень риска транзакции.</p>
+            </div>
+        </div>
+        <div class="about-img">
+            <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=800&auto=format&fit=crop" alt="AI Neural Data Processing">
+        </div>
+    </div>
+
+    <div class="features" style="margin-top: 24px;">
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Финансовая безопасность</h3>
+            <p>SafePay AI помогает снизить вероятность финансовых потерь и повысить безопасность цифровых платежей.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Работа в реальном времени</h3>
+            <p>Проверка операций выполняется мгновенно, обеспечивая быстрый анализ и принятие решений.</p>
+        </div>
+    </div>
+
+    <!-- ДИНАМИЧЕСКАЯ ТАБЛИЦА СТАТИСТИКИ -->
+    <div style="margin-top: 60px;">
+        <h3>📊 Оперативная сводка системы </h3>
+        <table class="dynamic-table" id="dynamicStatsTable">
+            <thead>
+                <tr>
+                    <th>Тип проверки</th>
+                    <th>Активность</th>
+                    <th>Статус ИИ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Транзакции</td><td class="activity-val">2450</td><td style="color:#10b981">Активен</td></tr>
+                <tr><td>Угрозы</td><td class="activity-val">12</td><td style="color:#ef4444">Блокировка</td></tr>
+                <tr><td>Пользователи</td><td class="activity-val">892</td><td style="color:#60a5fa">Защищены</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- AI АНАЛИЗ -->
+<section class="section" id="analysis">
+    <div class="section-title">
+        <h2>AI анализ транзакции</h2>
+        <p>Введите данные транзакции для проверки уровня риска мошенничества.</p>
+    </div>
+
+    <div class="ai-wrapper">
+        <div class="ai-panel">
+            <h3>Проверка операции</h3>
+            <div class="inputs">
+                <input type="number" id="amount" placeholder="Введите сумму транзакции">
+                <select id="country">
+                    <option>Казахстан</option>
+                    <option>Россия</option>
+                    <option>США</option>
+                    <option>Неизвестно</option>
+                </select>
+                <select id="device">
+                    <option>Личное устройство</option>
+                    <option>Общественный компьютер</option>
+                    <option>Неизвестное устройство</option>
+                </select>
+                <button class="btn btn-primary" onclick="checkRisk()">Запустить AI анализ</button>
+            </div>
+            <div class="result-box">
+                <h4 id="resultTitle">Ожидание анализа</h4>
+                <p id="resultText">После запуска система покажет уровень риска и рекомендации.</p>
+            </div>
+        </div>
+
+        <div class="ai-panel">
+            <h3>Уровень риска</h3>
+            <canvas id="chart"></canvas>
+        </div>
+    </div>
+</section>
+
+<!-- НОВАЯ СЕКЦИЯ: ЦЕЛЕВАЯ АУДИТОРИЯ -->
+<section class="section" id="audience">
+    <div class="section-title">
+        <h2>Целевая аудитория</h2>
+        <p>Кому помогает наш программный продукт обеспечивать безопасность финансовых активов.</p>
+    </div>
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎓</div>
+            <h3>Студенты</h3>
+            <p>Активно используют цифровые кошельки, микропереводы и часто становятся мишенью фишинга в соцсетях. Продукт обучает их базовой цифровой гигиене.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Пользователи онлайн-банкинга</h3>
+            <p>Люди, совершающие регулярные покупки, оплату счетов и переводы. ИИ защищает их транзакции в режиме 24/7 от скрытых киберугроз.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">👴</div>
+            <h3>Пожилые люди</h3>
+            <p>Наиболее уязвимая группа, подверженная изощренным методам социальной инженерии и телефонного мошенничества. Система вовремя блокирует кражу накоплений.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ВИДЫ УГРОЗ -->
+<section class="section" id="fraud-types">
+    <div class="section-title">
+        <h2>Мошенничество нового поколения</h2>
+        <p>Современные мошенники используют ИИ и методы социальной инженерии. SafePay AI предупреждает вас об этих угрозах.</p>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎭</div>
+            <h3>Deepfake мошенничество</h3>
+            <p>Использование ИИ для подделки голоса и видео «родственников».</p>
+            <button class="btn btn-secondary" onclick="openModal('🎭 Deepfake мошенничество', 'Deepfake — это технология ИИ, подделывающая голос и видео.\n\nПример: звонок от родственника с просьбой денег.\n\nКак защититься:\n- Не переводить деньги без проверки\n- Перезванивать самостоятельно\n- Задавать личные вопросы')">Подробнее</button>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📩</div>
+            <h3>Фишинговые сайты</h3>
+            <p>Поддельные сайты банков, ворующие пароли и данные карт.</p>
+            <button class="btn btn-secondary" onclick="openModal('📩 Фишинговые сайты', 'Фишинг — ссылки на поддельные сайты. Мошенники крадут логины и пароли в момент ввода.\n\nЗащита: всегда проверяйте адрес сайта (URL) в браузере.')">Подробнее</button>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💳</div>
+            <h3>Кража данных карты</h3>
+            <p>Обман пользователей с целью получения CVV и SMS-кодов.</p>
+            <button class="btn btn-secondary" onclick="openModal('💳 Кража данных карты', 'Мошенники представляются сотрудниками банка. Никогда не сообщайте CVV-код или SMS-подтверждение третьим лицам!')">Подробнее</button>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI-боты мошенников</h3>
+            <p>Автоматическое общение и психологическое давление через ботов.</p>
+            <button class="btn btn-secondary" onclick="openModal('🤖 AI-боты мошенников', 'Современные боты ведут реалистичный диалог. Они используют психологическое давление, чтобы заставить вас совершить ошибку.')">Подробнее</button>
+        </div>
+    </div>
+</section>
+
+<!-- ВИДЕО-ИНСТРУКЦИЯ -->
+<section class="section" id="process">
+    <div class="section-title">
+        <h2>Как работает система</h2>
+        <p>SafePay AI выполняет несколько этапов анализа для выявления опасных операций.</p>
+    </div>
+
+    <div class="cyber-video-wrapper">
+        <video controls style="width:100%; display:block; border-radius:22px;">
+          <source src="video.mp4" type="video/mp4">
+          Ваш браузер не поддерживает видео.
+        </video>
+    </div>
+
+    <div class="timeline" style="margin-top: 60px;">
+        <div class="timeline-card"><span>Этап 1</span><h3>Сбор данных</h3><p>Система получает информацию о сумме, устройстве и географии.</p></div>
+        <div class="timeline-card"><span>Этап 2</span><h3>AI анализ</h3><p>Алгоритм оценивает подозрительность транзакции в реальном времени.</p></div>
+        <div class="timeline-card"><span>Этап 3</span><h3>Оценка риска</h3><p>Система формирует уровень угрозы и визуализирует результат.</p></div>
+        <div class="timeline-card"><span>Этап 4</span><h3>Рекомендации</h3><p>Вы получаете четкие инструкции по дальнейшим действиям.</p></div>
+    </div>
+</section>
+
+<!-- НОВАЯ СЕКЦИЯ: FAQ (ВОПРОСЫ И ОТВЕТЫ) + БЛОК ТЕХНОЛОГИИ -->
+<section class="section" id="faq">
+    <div class="section-title">
+        <h2>Часто задаваемые вопросы (FAQ)</h2>
+        <p>Быстрые ответы на важные технические и пользовательские вопросы о работе SafePay AI.</p>
+    </div>
+    
+    <div class="faq-container">
+        <div class="faq-item">
+            <h3>Как AI определяет угрозы?</h3>
+            <p>Алгоритмы нейросети анализируют комбинации рисков в режиме реального времени: проверяется сумма перевода, страна инициации платежа, соответствие сигнатуры устройства и поведенческие паттерны пользователя.</p>
+        </div>
+        <div class="faq-item">
+            <h3>Безопасны ли мои данные?</h3>
+            <p>Абсолютно. Все входящие параметры проходят процесс сквозного хеширования. Система не сохраняет конфиденциальные реквизиты карт или персональные пароли пользователей.</p>
+        </div>
+        <div class="faq-item">
+            <h3>Что делать при подозрительной операции?</h3>
+            <p>В случае обнаружения высокого уровня риска (красный статус) немедленно приостановите транзакцию, проверьте получателя через альтернативные каналы связи или свяжитесь с вашим обслуживающим банком.</p>
+        </div>
+    </div>
+
+
+<!-- СВЯЗЬ И ПОМОЩНИК -->
+<section class="section" id="contact">
+    <div class="section-title">
+        <h2>Контакты и AI помощник</h2>
+        <p>Свяжитесь с разработчиками или задайте вопрос нашему ИИ.</p>
+    </div>
+
+    <div class="ai-wrapper">
+        <div class="ai-panel">
+            <h3>Контактная форма</h3>
+            <div class="inputs">
+                <input type="text" placeholder="Ваше имя">
+                <input type="email" placeholder="Email">
+                <textarea placeholder="Ваше сообщение" rows="4"></textarea>
+                <button class="btn btn-primary">Отправить сообщение</button>
+            </div>
+        </div>
+
+        <div class="ai-panel">
+            <h3>AI помощник SafePay</h3>
+            <div class="chat-box" id="chatBox">
+                <div class="message ai">Здравствуйте! Я AI помощник SafePay. Задайте вопрос о финансовой безопасности.</div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="userMessage" placeholder="Введите сообщение...">
+                <button class="btn btn-primary" onclick="sendMessage()">📡</button>
+            </div>
+
+            <!-- AI СОВЕТНИК -->
+            <div class="ai-motivation-box">
+                <p id="motivationDisplay">Нажми, чтобы получить совет от ИИ-агента</p>
+                <button class="btn btn-secondary" onclick="generateAIMotivation()" style="width:100%">🤖 Сгенерировать совет</button>
+            </div>
+
+            <button class="btn btn-secondary" id="musicBtn" onclick="toggleMusic()" style="width:100%; margin-top:15px;">▶ Включить музыку</button>
+            
+            <!-- ГРОМКОСТЬ МУЗЫКИ -->
+            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+                <span style="font-size:12px">Громкость ИИ-музыки:</span>
+                <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.5" style="width:100%">
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>Авторы: Айдана Дюсенбек и Бахыт Дуйсенбаева</p>
+    <p>Дисциплина: Информационно-коммуникационные технологии (ИКТ) | Университет Нархоз</p>
+    <p>Образовательные программы: Туризм и гостеприимство / Ресторанное дело и гостиничный бизнес</p>
+    <p>© 2026 SafePay AI</p>
+</footer>
+
+<script>
+    // SCI-FI ЗВУКОВОЙ КЛИК ИНТЕРФЕЙСА
+    function playClickSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.08);
+            
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.08);
+        } catch(e) { console.log("Audio context muted."); }
+    }
+
+    // Привязка звуков к кнопкам
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.btn, nav a, .back-to-top').forEach(button => {
+            button.addEventListener('click', playClickSound);
+        });
+    });
+
+    // ЭФФЕКТ ПЕЧАТНОЙ МАШИНКИ ДЛЯ ЗАГОЛОВКА
+    const typewriterPhrases = ["нового поколения."];
+    let phraseIdx = 0;
+    let letterIdx = 0;
+    let isDeleting = false;
+    const targetEl = document.getElementById("typewriterText");
+
+    function runTypewriter() {
+        if (!targetEl) return;
+        const currentPhrase = typewriterPhrases[phraseIdx];
+        
+        if (isDeleting) {
+            targetEl.innerText = currentPhrase.substring(0, letterIdx - 1);
+            letterIdx--;
+        } else {
+            targetEl.innerText = currentPhrase.substring(0, letterIdx + 1);
+            letterIdx++;
+        }
+
+        let speed = isDeleting ? 40 : 80;
+
+        if (!isDeleting && letterIdx === currentPhrase.length) {
+            speed = 2000;
+            isDeleting = true;
+        } else if (isDeleting && letterIdx === 0) {
+            isDeleting = false;
+            phraseIdx = (phraseIdx + 1) % typewriterPhrases.length;
+            speed = 400;
+        }
+
+        setTimeout(runTypewriter, speed);
+    }
+
+    function scrollToSection(id){
+        document.getElementById(id).scrollIntoView({behavior:'smooth'});
+    }
+
+    // Скролл, индикатор и подсветка меню
+    window.onscroll = function() {
+        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        let scrolled = (winScroll / height) * 100;
+        document.getElementById("myBar").style.width = scrolled + "%";
+
+        let upBtn = document.getElementById("backToTopBtn");
+        if (winScroll > 300) { upBtn.style.display = "block"; } else { upBtn.style.display = "none"; }
+
+        const sections = ['home', 'about', 'analysis', 'audience', 'faq', 'contact'];
+        sections.forEach(id => {
+            const sec = document.getElementById(id);
+            if(sec) {
+                const top = sec.offsetTop - 150;
+                const bottom = top + sec.offsetHeight;
+                if(winScroll >= top && winScroll < bottom) {
+                    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                    const activeLink = document.getElementById('link-' + id);
+                    if(activeLink) activeLink.classList.add('active');
+                }
+            }
+        });
+    };
+
+    function scrollToTop() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function openModal(title, text) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalText').innerText = text;
+        document.getElementById('fraudModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('fraudModal').style.display = 'none';
+    }
+
+    let chart;
+    function checkRisk(){
+        let amount = Number(document.getElementById('amount').value);
+        let country = document.getElementById('country').value;
+        let device = document.getElementById('device').value;
+        let risk = 10;
+
+        if(amount > 5000) risk += 45;
+        else if(amount > 2000) risk += 25;
+        if(country === 'Неизвестно') risk += 30;
+        if(device === 'Неизвестное устройство') risk += 25;
+        if(device === 'Общественный компьютер') risk += 10;
+
+        let title, text, color;
+        if(risk >= 80){
+            title = '🔴 Высокий риск';
+            text = 'Обнаружена высокая вероятность мошенничества. Операция заблокирована.';
+            color = '#ef4444';
+        } else if(risk >= 50){
+            title = '🟡 Средний риск';
+            text = 'Транзакция подозрительна. Рекомендуется ручная проверка.';
+            color = '#f59e0b';
+        } else {
+            title = '🟢 Низкий риск';
+            text = 'Транзакция безопасна. Подозрительных действий не выявлено.';
+            color = '#2563eb';
+        }
+
+        document.getElementById('resultTitle').innerHTML = title;
+        document.getElementById('resultText').innerHTML = text;
+        updateChart(risk, color);
+    }
+
+    function updateChart(risk, color = '#2563eb'){
+        const ctx = document.getElementById('chart');
+        if(chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type:'doughnut',
+            data:{
+                labels:['Риск %','Безопасно %'],
+                datasets:[{
+                    data:[risk, 100-risk],
+                    backgroundColor:[color,'rgba(255,255,255,0.05)'],
+                    borderWidth:0
+                }]
+            },
+            options:{ plugins:{ legend:{ labels:{ color:'white' } } }, cutout: '75%' }
+        });
+    }
+
+    const music = new Audio('music.mp3');
+    music.loop = true;
+    function toggleMusic(){
+        const btn = document.getElementById('musicBtn');
+        if(music.paused){
+            music.play(); btn.innerHTML = '⏸ Выключить музыку';
+        } else {
+            music.pause(); btn.innerHTML = '▶ Включить музыку';
+        }
+    }
+
+    document.getElementById('volumeControl').addEventListener('input', function(e) {
+        music.volume = e.target.value;
+    });
+
+    function sendMessage(){
+        let input = document.getElementById('userMessage');
+        let msg = input.value.trim().toLowerCase();
+        if(!msg) return;
+
+        const chatBox = document.getElementById('chatBox');
+        chatBox.innerHTML += `<div class="message user">${input.value}</div>`;
+        
+        let reply = 'AI анализирует запрос... Рекомендую соблюдать правила безопасности.';
+        if(msg.includes('мошен')) reply = 'Проверяйте ссылки и никогда не переводите деньги по просьбе из мессенджеров.';
+        if(msg.includes('карт')) reply = 'Никому не сообщайте данные карты и 3 цифры на обороте!';
+        if(msg.includes('привет')) reply = 'Здравствуйте! Я ИИ SafePay. Чем могу быть полезен?';
+
+        setTimeout(() => {
+            chatBox.innerHTML += `<div class="message ai">${reply}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 500);
+        input.value = '';
+    }
+
+    function generateAIMotivation() {
+        const advices = [
+            "Безопасность начинается с вас. Никогда не делитесь SMS-кодами!",
+            "ИИ SafePay напоминает: бдительность — лучшая защита от мошенников.",
+            "Сегодня отличный день, чтобы сменить пароль в банковском приложении.",
+            "Ваша цифровая гигиена напрямую влияет на сохранность ваших средств."
+        ];
+        const display = document.getElementById('motivationDisplay');
+        display.style.opacity = 0;
+        setTimeout(() => {
+            display.innerText = advices[Math.floor(Math.random() * advices.length)];
+            display.style.opacity = 1;
+        }, 300);
+    }
+
+    setInterval(() => {
+        const cells = document.querySelectorAll('.activity-val');
+        cells.forEach(cell => {
+            let val = parseInt(cell.innerText);
+            cell.innerText = val + Math.floor(Math.random() * 5);
+        });
+    }, 4000);
+
+    window.onload = () => {
+        updateChart(25);
+        runTypewriter();
+    };
+</script>
+
+</body>
+</html>

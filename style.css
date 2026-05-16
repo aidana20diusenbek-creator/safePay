@@ -1,0 +1,149 @@
+html{
+scroll-behavior:smooth;
+}
+
+body{
+margin:0;
+font-family:'Inter',sans-serif;
+background:#06111f;
+color:white;
+}
+
+/* HEADER */
+header{
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+padding:20px 40px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+}
+
+.logo{
+font-weight:bold;
+color:#60a5fa;
+}
+
+nav a{
+color:#cbd5e1;
+margin-left:15px;
+text-decoration:none;
+}
+
+/* HERO */
+.hero{
+padding:120px 20px;
+text-align:center;
+}
+
+/* SECTION */
+.section{
+padding:100px 20px;
+text-align:center;
+}
+
+/* INPUTS */
+input,select,textarea{
+padding:10px;
+margin:10px;
+border-radius:10px;
+border:none;
+background:#111827;
+color:white;
+}
+
+/* BUTTON */
+button{
+padding:12px 20px;
+border:none;
+border-radius:10px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+margin-top:10px;
+}
+
+/* RESULT */
+.result-box{
+margin-top:20px;
+}
+
+/* CHAT */
+.chat-box{
+background:#0f172a;
+padding:15px;
+border-radius:10px;
+height:200px;
+overflow:auto;
+margin:10px;
+}
+
+.message{
+margin:5px 0;
+padding:8px;
+border-radius:8px;
+}
+
+.user{background:#1d4ed8;}
+.ai{background:#1e293b;}
+
+canvas{
+margin-top:20px;
+max-width:400px;
+}
+/* FRAUD MODAL */
+
+.fraud-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 2000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.8); 
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+}
+
+.fraud-content {
+    background: #111827;
+    padding: 40px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.1);
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: modalScale 0.3s ease-out;
+}
+
+@keyframes modalScale {
+    from {transform: scale(0.8); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.close-modal:hover { color: white; }
+
+#fraudTitle {
+    color: #60a5fa;
+    margin-bottom: 20px;
+}
+
+#fraudText {
+    line-height: 1.8;
+    color: #cbd5e1;
+    white-space: pre-line; /* Чтобы работали переносы строк \n */
+}
